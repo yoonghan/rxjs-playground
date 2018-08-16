@@ -4,29 +4,9 @@ import {Observable, BehaviorSubject, Subject, ReplaySubject, AsyncSubject, Sched
 
 var button = document.querySelector('#button');
 
-
-// Observable.fromEvent(button, 'click')
-// .scan((count:number) => count + 1, 0)
-// .subscribe(count => console.log(`Clicked ${count} times`));
-
-
-// Observable.fromEvent(button, 'click')
-// .throttleTime(1000)
-// .scan((count:number) => count + 1, 0)
-// .subscribe(count => console.log(`Clicked ${count} times`));
-
-// Observable.fromEvent<MouseEvent>(button, 'click')
-// .throttleTime(1000)
-// .map(event => event.clientX)
-// .scan((count:number, clientX:number) => count + clientX, 0)
-// .subscribe(count => console.log(`Clicked ${count} times`));
-
-// Observable.fromEvent<MouseEvent>(button, 'click')
-// .throttleTime(1000)
-// .map(event => 2)
-// .scan((count:number, clientX) => count + clientX, 0)
-// .subscribe(count => console.log(`Clicked ${count} times`));
-
+/**
+ * First observable, view that this is a synch call, only the one with timeout is async
+ */
 // var observable = Observable.create(function (observer:any) {
 //   observer.next(1);
 //   observer.next(2);
@@ -44,7 +24,9 @@ var button = document.querySelector('#button');
 // });
 // console.log('just after subscribe');
 
-
+/**
+ * Simple subscribe with observable.
+ */
 // var foo = Observable.create(function(observer:any) {
 //   console.log('Hello');
 //   observer.next(42);
@@ -62,7 +44,9 @@ var button = document.querySelector('#button');
 //   console.log(y);
 // });
 
-
+/**
+ * Show multiple subscription and unsubscribe method
+ */
 // var observable = Observable.create(function subscribe(observer:any) {
 //   var id = setInterval(() => {
 //     observer.next("hello");
@@ -77,6 +61,9 @@ var button = document.querySelector('#button');
 // observable.subscribe((x:number) => console.log("B"+x)).unsubscribe();
 // observable.subscribe((x:number) => console.log("C"+x)).unsubscribe();
 
+/**
+ * This is different than subject, notice that counter for B is less 1, this proves that observable are created PER subscription.
+ */
 // var observer = {
 //   next: (x:string) => console.log('Observer got a next value: ' + x),
 //   error: (err:string) => console.error('Observer got an error: ' + err),
@@ -99,7 +86,9 @@ var button = document.querySelector('#button');
 //     observable.subscribe((count:string) => console.log("B:"+count));
 // }, 2000);
 
-
+/**
+ * It's similar to topic, previous messages are no longer resent.
+ */
 // var subject = new Subject();
 // subject.subscribe({
 //   next: (v) => console.log('observerA: ' + v)
@@ -112,7 +101,9 @@ var button = document.querySelector('#button');
 // subject.next(3);
 // subject.next(4);
 
-
+/**
+ * Subject is a subset of observable.
+ */
 // var subject = new Subject();
 // subject.subscribe({
 //   next: (v) => console.log('observerA: ' + v)
@@ -123,7 +114,19 @@ var button = document.querySelector('#button');
 // var observable = Observable.from([1, 2, 3]);
 // observable.subscribe(subject); // You can subscribe providing a Subject
 
-
+/**
+ * Subject is a subset of observable.
+1. First Observer subscribes to the multicasted Observable
+2. The multicasted Observable is connected
+3. The next value 0 is delivered to the first Observer
+4. Second Observer subscribes to the multicasted Observable
+5. The next value 1 is delivered to the first Observer
+6. The next value 1 is delivered to the second Observer
+7. First Observer unsubscribes from the multicasted Observable
+8. The next value 2 is delivered to the second Observer
+9. Second Observer unsubscribes from the multicasted Observable
+10. The connection to the multicasted Observable is unsubscribed
+ */
 // var source = Observable.interval(500);
 // var subject = new Subject();
 // var multicasted = source.multicast(subject);
@@ -155,6 +158,9 @@ var button = document.querySelector('#button');
 //   subscriptionConnect.unsubscribe(); // for the shared Observable execution
 // }, 2000);
 
+/**
+ * Comes packaged with initial value, similar to functional's reduce.
+ */
 // var subject = new BehaviorSubject(0); // 0 is the initial value
 // subject.subscribe({
 //   next: (v) => console.log('observerA: ' + v)
@@ -166,6 +172,9 @@ var button = document.querySelector('#button');
 // });
 // subject.next(3);
 
+/**
+ * Save a number of previous call, when another subscribers entered, they get the last N saved value.
+ */
 // var subject = new ReplaySubject(3); // buffer 3 values for new subscribers
 // subject.subscribe({
 //   next: (v) => console.log('observerA: ' + v)
@@ -180,6 +189,9 @@ var button = document.querySelector('#button');
 // });
 // subject.next(5);
 
+/**
+ * Only last value before complete will be displayed. Similar to async, last value is only returned to output.
+ */
 // var subject = new AsyncSubject(); // Only 5 will appear
 // subject.subscribe({
 //   next: (v) => console.log('observerA: ' + v)
@@ -194,7 +206,9 @@ var button = document.querySelector('#button');
 // subject.next(5);
 // subject.complete();
 
-
+/**
+ * Functional method in observable. Prototypal can't be use here.
+ */
 // function multiplyByTen(input:any) {
 //   var output = Observable.create(function subscribe(observer:any) {
 //     input.subscribe({
@@ -209,6 +223,9 @@ var button = document.querySelector('#button');
 // var output = multiplyByTen(input);
 // output.subscribe((x:number) => console.log(x));
 
+/**
+ * Create as async, refer first example where Observable is synch + asycn. This is actually not a scheduler - the name is.
+ */
 // var observable = Observable.create(function (observer:any) {
 //   observer.next(1);
 //   observer.next(2);
@@ -240,6 +257,46 @@ var button = document.querySelector('#button');
 // observable.subscribe(finalObserver);
 // console.log('just after subscribe');
 
+
+/**
+ * Make button observable, clicking will increase counter
+*/
+// Observable.fromEvent(button, 'click')
+// .scan((count:number) => count + 1, 0)
+// .subscribe(count => console.log(`Clicked ${count} times`));
+
+
+
+/**
+ * Sample for button click, with 1 second gap.
+*/
+// Observable.fromEvent(button, 'click')
+// .throttleTime(1000)
+// .scan((count:number) => count + 1, 0)
+// .subscribe(count => console.log(`Clicked ${count} times`));
+
+/**
+ * Sample for button click, with 1 second gap and output only the mouse x position.
+*/
+// Observable.fromEvent<MouseEvent>(button, 'click')
+// .throttleTime(1000)
+// .map(event => event.clientX)
+// .scan((count:number, clientX:number) => count + clientX, 0)
+// .subscribe(count => console.log(`Clicked ${count} times`));
+
+/**
+ * Sample for button click, with 1 second gap and mouse x + count
+*/
+// Observable.fromEvent<MouseEvent>(button, 'click')
+// .throttleTime(1000)
+// .map(event => 2)
+// .scan((count:number, clientX) => count + clientX, 0)
+// .subscribe(count => console.log(`Clicked ${count} times`));
+
+
+/**
+ * Sample for ajax call, this is a text output and not json.
+*/
 const reply = Observable.ajax({
   url:'https://raw.githubusercontent.com/yoonghan/presentation/master/2018/demo/sample.js',
     crossDomain: true,
