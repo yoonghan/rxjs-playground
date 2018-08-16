@@ -1,0 +1,22 @@
+{
+  "name": "LearnRxJS",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server --mode development",
+    "nodeRun": "babel-node ./src/es6/exec.js --presets es2015"
+  },
+  "dependencies": {
+    "npm": "^6.3.0"
+  },
+  "devDependencies": {
+    "@reactivex/rxjs": "^5.5.11",
+    "babel-cli": "^6.26.0",
+    "rxjs": "5.5.11",
+    "ts-loader": "^4.4.2",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  }
+}
